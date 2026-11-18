@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AXI Labs - People</title>
+<link rel="icon" href="favicon.ico">
+<style>
+:root{--bg:#181818;--panel:#222;--panel2:#292929;--text:#f4f4f4;--muted:#a9a9a9;--line:#3a3a3a;--accent:#59c7ff;--danger:#ff6262;--ok:#5ee38b;--blue:#1d9bf0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Arial,sans-serif}
+a{color:inherit}
+.top{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#1d1d1d;position:sticky;top:0;z-index:5}
+.brand{font-weight:800;letter-spacing:.8px}.back{color:var(--muted);text-decoration:none}.back:hover{color:#fff}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 22px 70px}
+h1{font-size:30px;margin:0 0 6px}.sub{color:var(--muted);margin:0 0 24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:#232323;color:var(--muted);border-radius:999px;padding:9px 16px;font-weight:700;cursor:pointer;font:inherit}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#101010}
+input,textarea{width:100%;border:1px solid #444;background:#191919;color:#fff;border-radius:9px;padding:11px 12px;outline:none;font:inherit}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(89,199,255,.12)}
+.btn{border:0;border-radius:9px;padding:9px 13px;font-weight:800;cursor:pointer;background:var(--accent);color:#101010;font:inherit}
+.btn.secondary{background:#333;color:#fff;border:1px solid #484848}
+.btn.ok{background:#1f7a4d;color:#fff}.btn.danger{background:#3a2020;color:#ff9b9b;border:1px solid #613737}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.hint{color:var(--muted);font-size:12px}
+.msg{margin-top:10px;min-height:18px;color:var(--muted)}.msg.ok{color:var(--ok)}.msg.err{color:var(--danger)}
+.user-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.user-row:last-child{border-bottom:0}
+.avatar{width:46px;height:46px;border-radius:50%;background:#313131;border:1px solid #444;display:grid;place-items:center;font-size:18px;font-weight:800;flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
+.avatar.lg{width:56px;height:56px;font-size:22px}
+.grow{flex:1;min-width:0}
+.uname{font-weight:800;display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.verified-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;font-size:10px;font-weight:900;line-height:1}
+.verified-badge::before{content:"✓"}
+.handle{color:var(--muted);font-size:12px}
+.bio{color:#c9c9c9;font-size:13px;margin-top:2px;overflow-wrap:anywhere}
+.row-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.section-title{font-size:17px;margin:22px 0 8px}
+.conv{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;cursor:pointer;border:1px solid transparent}
+.conv:hover{background:#262626;border-color:var(--line)}
+.conv .time{margin-left:auto;color:var(--muted);font-size:11px;flex-shrink:0}.unread-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-left:8px}
+.chat-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.chat-log{height:420px;overflow:auto;background:#191919;border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.bubble{max-width:75%;padding:9px 12px;border-radius:12px;background:#2b2b2b;align-self:flex-start;overflow-wrap:anywhere}
+.bubble.mine{background:#175a86;align-self:flex-end}
+.bubble .when{display:block;font-size:10px;color:#b9b9b9;margin-top:3px}
+.chat-form{display:flex;gap:8px;margin-top:10px}
+.chat-form input{flex:1}
+.empty{color:var(--muted);text-align:center;padding:26px 10px}
+.guest{max-width:560px;margin:70px auto;text-align:center}
+.hidden{display:none!important}
+@media(max-width:640px){.wrap{padding:24px 14px 60px}.top{padding:0 16px}.user-row{flex-wrap:wrap}.chat-log{height:52vh}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">AXI LABS - PEOPLE</div>
+  <a class="back" href="index.html">← Back to AXI Labs</a>
+</header>
+
+<main class="wrap">
+  <h1>People</h1>
+  <p class="sub">Find public accounts, add friends, and send direct messages.</p>
+
+  <section id="guest-view" class="guest card" hidden>
+    <div style="font-size:40px">🔒</div>
+    <h2>Sign in required</h2>
+    <p class="sub">Search, friends, and messages need a signed-in account.</p>
+    <a class="btn" href="login.html" style="display:inline-block;text-decoration:none">Sign In</a>
+  </section>
+
+  <section id="app-view" class="hidden">
+    <div class="tabs">
+      <button class="tab active" data-tab="search">🔍 Search</button>
+      <button class="tab" data-tab="friends">👥 Friends <span id="req-count"></span></button>
+      <button class="tab" data-tab="messages">💬 Messages</button>
+    </div>
+
+    <section id="pane-search">
+      <div class="card">
+        <input id="search-input" placeholder="Search by display name or @username" autocomplete="off">
+        <p class="hint" style="margin:8px 0 0">Only accounts with a <strong>public</strong> profile appear here. You can change that in <a href="account.html">Account settings</a>.</p>
+        <div id="search-msg" class="msg"></div>
+      </div>
+      <div id="search-results"></div>
+    </section>
+
+    <section id="pane-friends" class="hidden">
+      <div id="requests-box"></div>
+      <h2 class="section-title">Your friends</h2>
+      <div class="card" id="friends-list"></div>
+    </section>
+
+    <section id="pane-messages" class="hidden">
+      <div id="conv-view">
+        <h2 class="section-title" style="margin-top:0">Conversations</h2>
+        <div class="card" id="conv-list"></div>
+      </div>
+      <div id="chat-view" class="hidden">
+        <div class="chat-head">
+          <button class="btn secondary" id="chat-back">← Back</button>
+          <div class="grow" id="chat-title"></div>
+        </div>
+        <div class="chat-log" id="chat-log"></div>
+        <form class="chat-form" id="chat-form">
+          <input id="chat-input" maxlength="2000" placeholder="Write a message…" autocomplete="off">
+          <button class="btn" type="submit">Send</button>
+        </form>
+        <div class="msg" id="chat-msg"></div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc,
+  collection, query, where, getDocs, limit, onSnapshot,
+  addDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA0jc64vq-l9ngcxw1wm4iE8EZluqaL3jw",
+  authDomain: "maptitan-auth.firebaseapp.com",
+  projectId: "maptitan-auth",
+  storageBucket: "maptitan-auth.firebasestorage.app",
+  messagingSenderId: "303640467724",
+  appId: "1:303640467724:web:a1c048cbb835dff8dc1129",
+  measurementId: "G-WTFHY9DZ56"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const ADMIN_EMAILS = ["adminaxi@axilabs.com", "mesli@axilabs.com", "axilabs@gmail.com"];
+const isAdminEmail = e => ADMIN_EMAILS.includes(String(e || "").toLowerCase().trim());
+const friendId = (a, b) => (a < b ? a + "_" + b : b + "_" + a);
+
+const $ = id => document.getElementById(id);
+let me = null;
+let profileCache = new Map();
+let friendsSet = new Set();
+let outgoing = new Set();   // uids I sent a pending request to
+let incoming = new Map();   // uid -> requestId
+let convUnsub = null;
+let chatUnsub = null;
+let activePeer = null;
+
+/* ---------------- helpers ---------------- */
+function el(tag, props = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else if (k.startsWith("on")) n[k] = v;
+    else n.setAttribute(k, v);
+  }
+  kids.flat().forEach(k => { if (k != null) n.append(k.nodeType ? k : document.createTextNode(k)); });
+  return n;
+}
+function avatarNode(profile, letter, large) {
+  const n = el("div", { class: "avatar" + (large ? " lg" : "") });
+  const src = (profile && profile.photoURL) || "images/logo.png";
+  n.style.backgroundImage = `url("${String(src).replace(/"/g, '\\"')}")`;
+  n.style.backgroundSize = "cover";
+  n.style.backgroundPosition = "center";
+  n.style.color = "transparent";
+  return n;
+}
+function nameNode(profile, fallback) {
+  const name = (profile && profile.displayName) || fallback || "Member";
+  const wrap = el("span", { class: "uname" }, name);
+  if (profile && profile.verified) {
+    wrap.append(el("span", { class: "verified-badge", title: "Verified admin" }));
+  }
+  return wrap;
+}
+function setMsg(id, text, type) {
+  const n = $(id); if (!n) return;
+  n.textContent = text || "";
+  n.className = "msg" + (type ? " " + type : "");
+}
+async function loadProfile(uid) {
+  if (profileCache.has(uid)) return profileCache.get(uid);
+  let p = null;
+  try {
+    const snap = await getDoc(doc(db, "publicProfiles", uid));
+    if (snap.exists()) p = snap.data();
+  } catch (e) { p = null; }
+  profileCache.set(uid, p);
+  return p;
+}
+function labelFor(profile, uid) {
+  return (profile && (profile.displayName || profile.username)) || (uid === (me && me.uid) ? "You" : "Member");
+}
+
+/* ---------------- tabs ---------------- */
+const panes = { search: $("pane-search"), friends: $("pane-friends"), messages: $("pane-messages") };
+function showTab(name) {
+  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  for (const [k, p] of Object.entries(panes)) p.classList.toggle("hidden", k !== name);
+  if (name === "friends") refreshFriends();
+  if (name === "messages") openConversations();
+}
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+
+/* ---------------- search ---------------- */
+let searchTimer = 0;
+$("search-input").addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(runSearch, 280);
+});
+
+async function runSearch() {
+  const q = $("search-input").value.trim().toLowerCase();
+  const box = $("search-results");
+  box.textContent = "";
+  if (!q) { setMsg("search-msg", ""); return; }
+  setMsg("search-msg", "Searching…");
+  try {
+    await refreshRelations();
+    const snap = await getDocs(query(collection(db, "publicProfiles"), where("public", "==", true), limit(50)));
+    const results = [];
+    snap.forEach(d => {
+      const p = d.data() || {};
+      const name = String(p.displayNameLower || p.displayName || "").toLowerCase();
+      const user = String(p.usernameLower || p.username || "").toLowerCase();
+      if (d.id !== me.uid && (name.includes(q) || user.includes(q))) results.push({ uid: d.id, profile: p });
+    });
+    setMsg("search-msg", results.length ? "" : "No public accounts matched that search.");
+    if (!results.length) return;
+    const card = el("div", { class: "card" });
+    for (const r of results) {
+      profileCache.set(r.uid, r.profile);
+      card.append(renderUserRow(r.uid, r.profile));
+    }
+    box.append(card);
+  } catch (e) {
+    setMsg("search-msg", "Search failed: " + (e.message || e), "err");
+  }
+}
+
+function renderUserRow(uid, profile) {
+  const row = el("div", { class: "user-row" });
+  const letter = (labelFor(profile, uid) || "?").charAt(0).toUpperCase();
+  const info = el("div", { class: "grow" },
+    nameNode(profile, labelFor(profile, uid)),
+    el("div", { class: "handle", text: profile && profile.username ? "@" + profile.username : "" }),
+    profile && profile.bio ? el("div", { class: "bio", text: profile.bio }) : null
+  );
+  const actions = el("div", { class: "row-actions" });
+  if (uid === me.uid) {
+    actions.append(el("span", { class: "hint", text: "This is you" }));
+  } else if (friendsSet.has(uid)) {
+    actions.append(el("button", { class: "btn", text: "Message", onclick: () => { showTab("messages"); openChat(uid, profile); } }));
+  } else if (incoming.has(uid)) {
+    actions.append(
+      el("button", { class: "btn ok", text: "Accept", onclick: e => acceptRequest(uid, e.target) }),
+      el("button", { class: "btn danger", text: "Decline", onclick: e => declineRequest(uid, e.target) })
+    );
+  } else if (outgoing.has(uid)) {
+    actions.append(el("button", { class: "btn secondary", text: "Requested", disabled: "disabled" }));
+  } else {
+    actions.append(el("button", { class: "btn", text: "Add friend", onclick: e => sendRequest(uid, e.target) }));
+  }
+  row.append(avatarNode(profile, letter), info, actions);
+  return row;
+}
+
+/* ---------------- relationships ---------------- */
+async function refreshRelations() {
+  friendsSet = new Set();
+  outgoing = new Set();
+  incoming = new Map();
+
+  const friendsSnap = await getDocs(query(collection(db, "friends"), where("memberUids", "array-contains", me.uid)));
+  friendsSnap.forEach(d => {
+    const ids = (d.data() || {}).memberUids || [];
+    ids.forEach(id => { if (id !== me.uid) friendsSet.add(id); });
+  });
+
+  const sent = await getDocs(query(collection(db, "friendRequests"), where("fromUid", "==", me.uid), where("status", "==", "pending")));
+  sent.forEach(d => outgoing.add((d.data() || {}).toUid));
+
+  const recv = await getDocs(query(collection(db, "friendRequests"), where("toUid", "==", me.uid), where("status", "==", "pending")));
+  recv.forEach(d => {
+    const from = (d.data() || {}).fromUid;
+    if (from) incoming.set(from, d.id);
+  });
+
+  const badge = $("req-count");
+  if (badge) badge.textContent = incoming.size ? `(${incoming.size})` : "";
+}
+
+async function sendRequest(uid, btn) {
+  btn.disabled = true;
+  try {
+    await setDoc(doc(db, "friendRequests", me.uid + "_" + uid), {
+      fromUid: me.uid,
+      toUid: uid,
+      status: "pending",
+      createdAt: Date.now()
+    });
+    outgoing.add(uid);
+    btn.textContent = "Requested";
+    btn.className = "btn secondary";
+    btn.disabled = true;
+  } catch (e) {
+    btn.disabled = false;
+    alert("Could not send request: " + (e.message || e));
+  }
+}
+
+async function acceptRequest(uid, btn) {
+  btn.disabled = true;
+  try {
+    const reqId = incoming.get(uid);
+    await updateDoc(doc(db, "friendRequests", reqId), { status: "accepted", updatedAt: Date.now() });
+    const ids = [me.uid, uid].sort();
+    await setDoc(doc(db, "friends", friendId(me.uid, uid)), {
+      memberUids: ids,
+      createdAt: Date.now()
+    });
+    await refreshFriends();
+  } catch (e) {
+    btn.disabled = false;
+    alert("Could not accept: " + (e.message || e));
+  }
+}
+
+async function declineRequest(uid, btn) {
+  btn.disabled = true;
+  try {
+    await updateDoc(doc(db, "friendRequests", incoming.get(uid)), { status: "declined", updatedAt: Date.now() });
+    await refreshFriends();
+  } catch (e) {
+    btn.disabled = false;
+    alert("Could not decline: " + (e.message || e));
+  }
+}
+
+async function refreshFriends() {
+  if (!me) return;
+  await refreshRelations();
+  const list = $("friends-list");
+  const reqBox = $("requests-box");
+  list.textContent = "";
+  reqBox.textContent = "";
+
+  if (incoming.size) {
+    const card = el("div", { class: "card" }, el("h2", { class: "section-title", style: "margin-top:0", text: "Friend requests" }));
+    for (const uid of incoming.keys()) {
+      const p = await loadProfile(uid);
+      card.append(renderUserRow(uid, p));
+    }
+    reqBox.append(card);
+  }
+
+  if (!friendsSet.size) {
+    list.append(el("div", { class: "empty", text: "No friends yet. Use Search to find people." }));
+    return;
+  }
+  for (const uid of friendsSet) {
+    const p = await loadProfile(uid);
+    list.append(renderUserRow(uid, p));
+  }
+}
+
+/* ---------------- messages ---------------- */
+function openConversations() {
+  $("conv-view").classList.remove("hidden");
+  $("chat-view").classList.add("hidden");
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  if (convUnsub) convUnsub();
+  const list = $("conv-list");
+  list.textContent = "";
+  convUnsub = onSnapshot(query(collection(db, "conversations"), where("memberUids", "array-contains", me.uid)),
+    snap => {
+      const items = [];
+      snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+      items.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      list.textContent = "";
+      if (!items.length) {
+        list.append(el("div", { class: "empty", text: "No conversations yet. Message a friend from Search or Friends." }));
+        return;
+      }
+      for (const c of items) {
+        const peer = (c.memberUids || []).find(id => id !== me.uid) || "";
+        const row = el("div", { class: "conv" });
+        const info = el("div", { class: "grow" },
+          el("div", { class: "uname", text: labelFor(profileCache.get(peer), peer) }),
+          el("div", { class: "handle", text: c.lastMessage || "Say hello" })
+        );
+        const readAt = (c.reads && c.reads[me.uid]) || 0;
+        const lastAt = c.lastMessageAt || c.updatedAt || 0;
+        const unread = !!(c.lastFrom && c.lastFrom !== me.uid && lastAt > readAt);
+        const when = el("div", { class: "time", text: c.updatedAt ? new Date(c.updatedAt).toLocaleDateString() : "" });
+        row.append(avatarNode(profileCache.get(peer), (labelFor(profileCache.get(peer), peer) || "?").charAt(0).toUpperCase()), info);
+        if (unread) row.append(el("div", { class: "unread-dot", title: "New message" }));
+        row.append(when);
+        row.onclick = async () => { const p = await loadProfile(peer); openChat(peer, p); };
+        loadProfile(peer).then(p => {
+          if (p) {
+            info.firstChild.textContent = labelFor(p, peer);
+            if (p.verified) info.firstChild.append(el("span", { class: "verified-badge" }));
+          }
+        });
+        list.append(row);
+      }
+    },
+    err => { list.textContent = ""; list.append(el("div", { class: "empty", text: "Could not load conversations: " + (err.message || err) })); }
+  );
+}
+
+async function openChat(peerUid, peerProfile) {
+  activePeer = peerUid;
+  $("conv-view").classList.add("hidden");
+  $("chat-view").classList.remove("hidden");
+  setMsg("chat-msg", "");
+
+  const title = $("chat-title");
+  title.textContent = "";
+  const p = peerProfile || await loadProfile(peerUid);
+  const letter = (labelFor(p, peerUid) || "?").charAt(0).toUpperCase();
+  title.append(avatarNode(p, letter), nameNode(p, labelFor(p, peerUid)));
+
+  const cid = friendId(me.uid, peerUid);
+  const log = $("chat-log");
+  log.textContent = "Loading…";
+
+  // Make sure the conversation document exists before reading its messages,
+  // because the messages read rule checks membership on that document.
+  const cRef = doc(db, "conversations", cid);
+  try {
+    const cs = await getDoc(cRef);
+    if (!cs.exists()) {
+      await setDoc(cRef, { memberUids: [me.uid, peerUid].sort(), updatedAt: Date.now() });
+    }
+    await updateDoc(cRef, { ["reads." + me.uid]: Date.now() });
+  } catch (e) {
+    setMsg("chat-msg", "Could not open conversation: " + (e.message || e), "err");
+  }
+
+  if (chatUnsub) chatUnsub();
+  chatUnsub = onSnapshot(query(collection(db, "conversations", cid, "messages")),
+    snap => {
+      const msgs = [];
+      snap.forEach(d => msgs.push(d.data() || {}));
+      msgs.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      log.textContent = "";
+      if (!msgs.length) log.append(el("div", { class: "empty", text: "No messages yet. Say hello 👋" }));
+      for (const m of msgs) {
+        const mine = m.fromUid === me.uid;
+        log.append(el("div", { class: "bubble" + (mine ? " mine" : "") },
+          m.text || "",
+          el("span", { class: "when", text: m.createdAt ? new Date(m.createdAt).toLocaleString() : "" })
+        ));
+      }
+      log.scrollTop = log.scrollHeight;
+      if (msgs.length && msgs[msgs.length - 1].fromUid !== me.uid) {
+        updateDoc(cRef, { ["reads." + me.uid]: Date.now() }).catch(() => {});
+      }
+    },
+    err => { log.textContent = ""; log.append(el("div", { class: "empty", text: "Could not load messages: " + (err.message || err) })); }
+  );
+
+  $("chat-form").onsubmit = async e => {
+    e.preventDefault();
+    const input = $("chat-input");
+    const text = input.value.trim();
+    if (!text) return;
+    if (!friendsSet.has(peerUid)) { setMsg("chat-msg", "You can only message friends.", "err"); return; }
+    input.value = "";
+    try {
+      const ids = [me.uid, peerUid].sort();
+      await setDoc(doc(db, "conversations", cid), {
+        memberUids: ids,
+        updatedAt: Date.now(),
+        lastMessageAt: Date.now(),
+        lastMessage: text.slice(0, 120),
+        lastFrom: me.uid
+      }, { merge: true });
+      await updateDoc(doc(db, "conversations", cid), { ["reads." + me.uid]: Date.now() }).catch(() => {});
+      await addDoc(collection(db, "conversations", cid, "messages"), {
+        fromUid: me.uid,
+        text,
+        createdAt: Date.now()
+      });
+    } catch (err) {
+      input.value = text;
+      setMsg("chat-msg", "Could not send: " + (err.message || err), "err");
+    }
+  };
+}
+
+$("chat-back").onclick = () => {
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  $("chat-view").classList.add("hidden");
+  $("conv-view").classList.remove("hidden");
+};
+
+/* ---------------- boot ---------------- */
+onAuthStateChanged(auth, async user => {
+  me = user || null;
+  if (!user) {
+    $("guest-view").hidden = false;
+    $("app-view").classList.add("hidden");
+    return;
+  }
+  $("guest-view").hidden = true;
+  $("app-view").classList.remove("hidden");
+  try {
+    await refreshRelations();
+    const mine = await loadProfile(me.uid);
+    if (!mine) setMsg("search-msg", "Tip: create your public profile in Account settings so others can find you.", "ok");
+  } catch (e) {
+    setMsg("search-msg", "Could not load data: " + (e.message || e), "err");
+  }
+});
+</script>
+</body>
+</html>

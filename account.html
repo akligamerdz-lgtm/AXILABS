@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AXI Labs — Account Settings</title>
+<style>
+:root{--bg:#181818;--panel:#222;--panel2:#292929;--text:#f4f4f4;--muted:#a9a9a9;--line:#3a3a3a;--accent:#59c7ff;--danger:#ff6262;--ok:#5ee38b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Arial,sans-serif}
+a{color:inherit}.top{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#1d1d1d;position:sticky;top:0;z-index:5}
+.brand{font-weight:800;letter-spacing:.8px}.back{color:var(--muted);text-decoration:none}.back:hover{color:#fff}
+.wrap{max-width:1050px;margin:0 auto;padding:38px 22px 70px}
+h1{font-size:32px;margin:0 0 7px}.sub{color:var(--muted);margin:0 0 28px}
+.grid{display:grid;grid-template-columns:260px 1fr;gap:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px}
+.side-card{height:max-content;position:sticky;top:84px}.profile-preview{text-align:center}
+.avatar{width:104px;height:104px;border-radius:50%;margin:2px auto 13px;background:#313131;border:2px solid #444;display:grid;place-items:center;font-size:38px;font-weight:800;overflow:hidden;background-size:cover;background-position:center}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.name{font-weight:800;font-size:18px;display:inline-flex;align-items:center;gap:6px;justify-content:center}.verified-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#1d9bf0;color:#fff;font-size:11px;font-weight:900;line-height:1;vertical-align:middle}.verified-badge::before{content:"✓"}.email{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+.status{display:inline-flex;margin-top:12px;padding:5px 9px;border-radius:999px;background:#163d2b;color:#8df0b2;font-size:12px}
+h2{font-size:19px;margin:0 0 4px}.hint{color:var(--muted);font-size:12px;margin:0 0 18px}
+label{display:block;font-weight:700;margin:14px 0 7px}
+input,textarea{width:100%;border:1px solid #444;background:#191919;color:#fff;border-radius:9px;padding:11px 12px;outline:none;font:inherit}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(89,199,255,.12)}
+textarea{min-height:95px;resize:vertical}
+input[readonly]{opacity:.65}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer;background:var(--accent);color:#101010}
+.btn.secondary{background:#333;color:#fff;border:1px solid #484848}.btn.danger{background:#3a2020;color:#ff9b9b;border:1px solid #613737}
+.btn:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.msg{margin-top:12px;min-height:18px;color:var(--muted)}.msg.ok{color:var(--ok)}.msg.err{color:var(--danger)}
+.upload{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.upload input{max-width:100%}
+.public-list{margin:10px 0 0;padding-left:19px;color:var(--muted)}.public-list strong{color:#fff}
+.switch{display:flex;align-items:flex-start;gap:10px;margin-top:14px}.switch input{width:auto;margin-top:4px}
+.locked{opacity:.65}.guest{max-width:620px;margin:70px auto;text-align:center}
+.guest .card{padding:34px}.guest h1{font-size:28px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.side-card{position:static}.row{grid-template-columns:1fr}.top{padding:0 16px}.wrap{padding:28px 14px 50px}}
+</style>
+
+<style id="real-account-auth-style">
+.email-label{
+  margin-top:10px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  color:#777;
+}
+.account-email{
+  margin-top:3px;
+  color:#d7d7d7;
+  font-weight:700;
+}
+.auth-note{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:9px;
+  background:#172d3a;
+  border:1px solid #28536a;
+  color:#a9ddf6;
+  font-size:12px;
+}
+</style>
+<style id="auth-loading-style">
+.account-view-hidden{}
+.auth-loading{opacity:.72;transition:opacity .2s ease}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">AXI LABS — ACCOUNT</div>
+  <a class="back" href="index.html">← Back to AXI Labs</a>
+</header>
+
+<main class="wrap">
+  <h1>Account Settings</h1>
+  <p class="sub">Manage your profile, avatar, password, and what information is public.</p>
+
+  <section id="guest-view" class="guest" hidden>
+    <div class="card">
+      <div style="font-size:42px">🔒</div>
+      <h1>Sign in required</h1>
+      <p class="sub">Account settings are only available when you are signed in. You can keep using public AXI Labs features as a guest.</p>
+      <a class="btn" href="login.html" style="display:inline-block;text-decoration:none">🔑 Sign In</a>
+    </div>
+  </section>
+
+  <section id="account-view" class="grid auth-loading" hidden>
+    <aside class="card side-card profile-preview">
+      <div id="preview-avatar" class="avatar">G</div>
+      <div id="preview-name-wrap" class="name"><span id="preview-name">Member</span><span id="preview-verified" class="verified-badge" hidden title="Verified admin"></span></div>
+      <div class="email-label">SIGNED-IN ACCOUNT</div>
+      <div id="preview-email" class="email account-email">—</div>
+      <div class="status">● Signed in with Firebase</div>
+      <div class="actions" style="justify-content:center">
+        <button id="signout" class="btn secondary">Sign out</button>
+      </div>
+    </aside>
+
+    <div>
+      <section class="card">
+        <h2>Profile</h2>
+        <p class="hint">These are the profile details AXI Labs can show publicly when your public profile is enabled.</p>
+        <div id="auth-account-note" class="auth-note">Checking the signed-in Firebase account…</div>
+        <div class="row">
+          <div>
+            <label for="display-name">Display name</label>
+            <input id="display-name" maxlength="40" placeholder="Your name">
+          </div>
+          <div>
+            <label for="username">Username</label>
+            <input id="username" maxlength="24" placeholder="@username">
+          </div>
+        </div>
+        <label for="bio">Bio</label>
+        <textarea id="bio" maxlength="160" placeholder="A short public bio"></textarea>
+
+        <label class="switch">
+          <input id="public-profile" type="checkbox" checked>
+          <span><strong>Public profile</strong><br><span class="hint">Allow your display name, avatar, username and bio to appear on public AXI Labs features.</span></span>
+        </label>
+
+        <div class="actions">
+          <button id="save-profile" class="btn">Save profile</button>
+        </div>
+        <div id="profile-msg" class="msg"></div>
+      </section>
+
+      <section class="card">
+        <h2>Avatar</h2>
+        <p class="hint">Upload a JPG, PNG, GIF or WebP image. The avatar is stored with your Firebase account.</p>
+        <div class="upload">
+          <input id="avatar-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp">
+          <button id="remove-avatar" class="btn secondary">Remove avatar</button>
+        </div>
+        <div id="avatar-msg" class="msg"></div>
+      </section>
+
+      <section class="card">
+        <h2>Security</h2>
+        <p class="hint">Change your Firebase account password. For security, Firebase may ask you to sign in again before changing it.</p>
+        <label for="new-password">New password</label>
+        <input id="new-password" type="password" minlength="6" autocomplete="new-password" placeholder="At least 6 characters">
+        <label for="confirm-password">Confirm new password</label>
+        <input id="confirm-password" type="password" minlength="6" autocomplete="new-password" placeholder="Repeat the password">
+        <div class="actions">
+          <button id="change-password" class="btn">Change password</button>
+        </div>
+        <div id="password-msg" class="msg"></div>
+      </section>
+
+      <section class="card">
+        <h2>What is public?</h2>
+        <p class="hint">AXI Labs should keep account credentials private. Public profile information is separate from your login credentials.</p>
+        <ul class="public-list">
+          <li><strong>Public when enabled:</strong> display name, avatar, username and bio.</li>
+          <li><strong>Private:</strong> password and authentication credentials.</li>
+          <li><strong>Email:</strong> used for authentication and is not displayed as public profile data by this page.</li>
+        </ul>
+      </section>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+const firebaseConfig = {
+  apiKey:"AIzaSyA0jc64vq-l9ngcxw1wm4iE8EZluqaL3jw",
+  authDomain:"maptitan-auth.firebaseapp.com",
+  projectId:"maptitan-auth",
+  storageBucket:"maptitan-auth.firebasestorage.app",
+  messagingSenderId:"303640467724",
+  appId:"1:303640467724:web:a1c048cbb835dff8dc1129"
+};
+
+const $ = id => document.getElementById(id);
+function msg(id,text,type=''){ const e=$(id); e.textContent=text; e.className='msg '+type; }
+
+try{
+  const {initializeApp} = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  const {getAuth,onAuthStateChanged,updateProfile,updatePassword,signOut,reauthenticateWithCredential,EmailAuthProvider} =
+    await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+  const {getFirestore,doc,getDoc,setDoc,collection,query,where,getDocs,updateDoc} =
+    await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+  const {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} =
+    await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
+
+  const app=initializeApp(firebaseConfig);
+  const auth=getAuth(app), db=getFirestore(app), storage=getStorage(app);
+  const ADMIN_EMAILS=["adminaxi@axilabs.com","mesli@axilabs.com","axilabs@gmail.com"];
+  const isVerifiedAdmin=(email)=>ADMIN_EMAILS.includes(String(email||'').toLowerCase().trim());
+  const DEFAULT_AVATAR='images/logo.png';
+  const avatarFor=(u)=>u.photoURL||(String(u.email||'').toLowerCase().trim()==='mesli@axilabs.com'?'accav/mesli.png':DEFAULT_AVATAR);
+  async function syncPostAvatars(uid,url,extra){
+    try{
+      const patch=Object.assign({authorPhoto:url},extra||{});
+      const snap=await getDocs(query(collection(db,'posts'),where('authorUid','==',uid)));
+      snap.forEach(d=>{updateDoc(d.ref,patch).catch(()=>{});});
+    }catch(e){}
+  }
+
+  function initials(name){return (name||'G').trim().charAt(0).toUpperCase()||'G'}
+  function renderAvatar(url,name){
+    const a=$('preview-avatar');
+    const src=url||DEFAULT_AVATAR;
+    a.innerHTML='<img alt="Avatar">';
+    a.querySelector('img').src=src;
+  }
+
+  function renderAuthUser(user){
+    if(!user){
+      $('guest-view').hidden=false;
+      $('account-view').hidden=true;
+      return;
+    }
+
+    $('guest-view').hidden=true;
+    $('account-view').hidden=false;
+    $('account-view').classList.remove('auth-loading');
+
+    // Firebase Auth is the real account identity.
+    // No email is typed or trusted from the page.
+    const signedEmail = user.email || '';
+    $('preview-email').textContent = signedEmail || 'Firebase account';
+    $('auth-account-note').textContent = signedEmail
+      ? `Signed account: ${signedEmail}`
+      : 'Signed in, but Firebase did not provide an email address for this provider.';
+    $('display-name').value = user.displayName || '';
+    $('preview-name').textContent = user.displayName || user.email?.split('@')[0] || 'Member';
+    const v=$('preview-verified'); if(v) v.hidden=!isVerifiedAdmin(signedEmail);
+    const avUrl = avatarFor(user);
+    renderAvatar(avUrl, user.displayName || user.email);
+
+    // Public profile data is optional; it must never block authentication.
+    getDoc(doc(db,'publicProfiles',user.uid)).then(snap=>{
+      if(snap.exists()){
+        const p=snap.data()||{};
+        $('username').value=p.username||'';
+        $('bio').value=p.bio||'';
+        $('public-profile').checked=p.public!==false;
+      }
+    }).catch(e=>{
+      msg('profile-msg','Could not load public profile data. Check your Firestore rules.','err');
+    });
+  }
+
+  // Wait for Firebase to restore the existing signed-in session.
+  // This prevents the page from getting stuck on "Checking..."
+  // while auth.currentUser is still being restored.
+  try{
+    if(typeof auth.authStateReady === 'function'){
+      await auth.authStateReady();
+    }
+  }catch(e){
+    console.warn('Firebase auth state initialization:', e);
+  }
+
+  renderAuthUser(auth.currentUser);
+  onAuthStateChanged(auth, user => renderAuthUser(user));
+
+  // If Firebase/network is genuinely unavailable, tell the user instead of
+  // leaving an endless-looking loading message.
+  setTimeout(()=>{
+    const note=$('auth-account-note');
+    if(note && note.textContent.includes('Checking the signed-in Firebase account')){
+      note.textContent='Firebase is taking too long to restore the session. Refresh once, or sign in again.';
+    }
+  },7000);
+
+  $('save-profile').onclick=async()=>{
+    const user=auth.currentUser;
+    if(!user)return;
+    const name=$('display-name').value.trim();
+    const username=$('username').value.trim().replace(/^@+/,'');
+    const bio=$('bio').value.trim();
+    const isPublic=$('public-profile').checked;
+    if(!name){msg('profile-msg','Display name is required.','err');return}
+    if(username && !/^[A-Za-z0-9_.-]{2,24}$/.test(username)){msg('profile-msg','Username: 2–24 letters, numbers, dots, underscores or hyphens.','err');return}
+    try{
+      await updateProfile(user,{displayName:name});
+      await setDoc(doc(db,'publicProfiles',user.uid),{
+        uid:user.uid,
+        username,bio,public:isPublic,displayName:name,
+        usernameLower:username.toLowerCase(),
+        displayNameLower:name.toLowerCase(),
+        photoURL:avatarFor(user),
+        verified:isVerifiedAdmin(user.email||''),
+        updatedAt:Date.now()
+      },{merge:true});
+      $('preview-name').textContent=name;
+      const v=$('preview-verified'); if(v) v.hidden=!isVerifiedAdmin(user.email||'');
+      renderAvatar(avatarFor(user),name);
+      syncPostAvatars(user.uid,avatarFor(user),Object.assign({authorName:name}, username?{authorUsername:username}:{}));
+      msg('profile-msg','Profile saved.','ok');
+    }catch(e){msg('profile-msg','Could not save profile: '+(e.message||e),'err')}
+  };
+
+  $('avatar-file').onchange=async()=>{
+    const user=auth.currentUser, file=$('avatar-file').files[0];
+    if(!user||!file)return;
+    if(file.size>5*1024*1024){msg('avatar-msg','Avatar must be 5 MB or smaller.','err');return}
+    if(!/^image\/(png|jpe?g|gif|webp)$/.test(file.type)){msg('avatar-msg','Please choose a JPG, PNG, GIF or WebP image.','err');return}
+    msg('avatar-msg','Uploading avatar…');
+    try{
+      const storageRef=ref(storage,'avatars/'+user.uid+'/avatar');
+      await uploadBytes(storageRef,file,{contentType:file.type});
+      const url=await getDownloadURL(storageRef);
+      await updateProfile(user,{photoURL:url});
+      renderAvatar(url,user.displayName||user.email);
+      try{await setDoc(doc(db,'publicProfiles',user.uid),{uid:user.uid,photoURL:url,verified:isVerifiedAdmin(user.email||'')},{merge:true});}catch(e){}
+      syncPostAvatars(user.uid,url);
+      msg('avatar-msg','Avatar updated.','ok');
+    }catch(e){msg('avatar-msg','Avatar upload failed. Check Firebase Storage rules.','err')}
+  };
+
+  $('remove-avatar').onclick=async()=>{
+    const user=auth.currentUser;if(!user)return;
+    try{
+      const storageRef=ref(storage,'avatars/'+user.uid+'/avatar');
+      try{await deleteObject(storageRef)}catch(e){}
+      await updateProfile(user,{photoURL:null});
+      renderAvatar(avatarFor(user),user.displayName||user.email);
+      try{await setDoc(doc(db,'publicProfiles',user.uid),{uid:user.uid,photoURL:avatarFor(user),verified:isVerifiedAdmin(user.email||'')},{merge:true});}catch(e){}
+      syncPostAvatars(user.uid,avatarFor(user));
+      msg('avatar-msg','Avatar removed; the default avatar is now shown.','ok');
+    }catch(e){msg('avatar-msg','Could not remove the avatar.','err')}
+  };
+
+  $('change-password').onclick=async()=>{
+    const user=auth.currentUser;if(!user)return;
+    const p=$('new-password').value, c=$('confirm-password').value;
+    if(p.length<6){msg('password-msg','Password must be at least 6 characters.','err');return}
+    if(p!==c){msg('password-msg','Passwords do not match.','err');return}
+    try{
+      await updatePassword(user,p);
+      $('new-password').value='';$('confirm-password').value='';
+      msg('password-msg','Password changed successfully.','ok');
+    }catch(e){
+      if(e.code==='auth/requires-recent-login'){
+        msg('password-msg','For security, sign out and sign in again, then change the password.','err');
+      }else msg('password-msg','Could not change password: '+(e.message||e),'err');
+    }
+  };
+
+  $('signout').onclick=async()=>{
+    await signOut(auth);
+    location.href='index.html';
+  };
+}catch(e){
+  $('guest-view').hidden=false;
+  $('account-view').hidden=true;
+  console.error('AXI Labs Firebase Auth error:',e);
+}
+</script>
+<!-- AXI Labs reCAPTCHA v3 (host-guarded background check) -->
+<script src="axi-recaptcha.js" defer></script>
+</body>
+</html>
